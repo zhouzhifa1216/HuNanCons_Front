@@ -3,7 +3,7 @@
  */
 
 // API基础URL
-export const API_BASE_URL = 'http://127.0.0.1:7999';
+export const API_BASE_URL = 'http://192.168.10.25:7999';
 
 // 存储在localStorage中的键名
 export const STORAGE_KEYS = {

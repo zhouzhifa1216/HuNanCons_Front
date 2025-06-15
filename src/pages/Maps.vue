@@ -1,36 +1,12 @@
 <template>
   <div class="maps-container">
-    <div class="map-controls">
-      <div class="control-panel">
-        <h4 class="control-title">地图控制</h4>
-        <div class="control-buttons">
-          <button class="control-btn" @click="zoomIn">
-            <i class="ti-plus"></i>
-          </button>
-          <button class="control-btn" @click="zoomOut">
-            <i class="ti-minus"></i>
-          </button>
-          <button class="control-btn" @click="resetView">
-            <i class="ti-home"></i>
-          </button>
-        </div>
-        <div class="layer-selector">
-          <label>图层选择</label>
-          <select v-model="currentLayer" @change="changeMapStyle">
-            <option value="standard">标准视图</option>
-            <option value="satellite">卫星视图</option>
-            <option value="terrain">地形视图</option>
-          </select>
-        </div>
-      </div>
-    </div>
-    
+
     <div class="map-container">
-      <div id="map"></div>
+      <BaseMap @updatePosition="handlePositionUpdate"></BaseMap>
       <div class="map-info">
         <div class="coordinates">
-          <span>经度: {{ currentPosition.lng.toFixed(6) }}</span>
-          <span>纬度: {{ currentPosition.lat.toFixed(6) }}</span>
+          <span>经度: {{ currentPosition.lng.toFixed(3) }}</span>
+          <span>纬度: {{ currentPosition.lat.toFixed(3) }}</span>
         </div>
       </div>
     </div>
@@ -38,188 +14,29 @@
 </template>
 
 <script>
+import BaseMap from './BaseMap.vue'
+
+
 export default {
+  components: {
+    BaseMap
+  },
   data() {
     return {
-      map: null,
-      marker: null,
-      currentLayer: 'standard',
       currentPosition: {
-        lat: 40.748817,
-        lng: -73.985428
+        lat: 111.608,
+        lng: 26.423
       },
-      mapStyles: {
-        standard: [
-          {
-            featureType: "water",
-            stylers: [{ saturation: 43 }, { lightness: -11 }, { hue: "#0088ff" }],
-          },
-          {
-            featureType: "road",
-            elementType: "geometry.fill",
-            stylers: [
-              { hue: "#ff0000" },
-              { saturation: -100 },
-              { lightness: 99 },
-            ],
-          },
-          {
-            featureType: "road",
-            elementType: "geometry.stroke",
-            stylers: [{ color: "#808080" }, { lightness: 54 }],
-          },
-          {
-            featureType: "landscape.man_made",
-            elementType: "geometry.fill",
-            stylers: [{ color: "#ece2d9" }],
-          },
-          {
-            featureType: "poi.park",
-            elementType: "geometry.fill",
-            stylers: [{ color: "#ccdca1" }],
-          },
-          {
-            featureType: "road",
-            elementType: "labels.text.fill",
-            stylers: [{ color: "#767676" }],
-          },
-          {
-            featureType: "road",
-            elementType: "labels.text.stroke",
-            stylers: [{ color: "#ffffff" }],
-          },
-          { featureType: "poi", stylers: [{ visibility: "off" }] },
-          {
-            featureType: "landscape.natural",
-            elementType: "geometry.fill",
-            stylers: [{ visibility: "on" }, { color: "#b8cb93" }],
-          },
-          { featureType: "poi.park", stylers: [{ visibility: "on" }] },
-          {
-            featureType: "poi.sports_complex",
-            stylers: [{ visibility: "on" }],
-          },
-          { featureType: "poi.medical", stylers: [{ visibility: "on" }] },
-          {
-            featureType: "poi.business",
-            stylers: [{ visibility: "simplified" }],
-          },
-        ],
-        satellite: [],
-        terrain: [
-          {
-            featureType: "landscape.natural",
-            elementType: "geometry.fill",
-            stylers: [{ visibility: "on" }, { color: "#e0efef" }],
-          },
-          {
-            featureType: "poi",
-            elementType: "geometry.fill",
-            stylers: [{ visibility: "on" }, { hue: "#1900ff" }, { color: "#c0e8e8" }],
-          },
-          {
-            featureType: "road",
-            elementType: "geometry",
-            stylers: [{ lightness: 100 }, { visibility: "simplified" }],
-          },
-          {
-            featureType: "transit.line",
-            elementType: "geometry",
-            stylers: [{ visibility: "on" }, { lightness: 700 }],
-          },
-          {
-            featureType: "water",
-            elementType: "all",
-            stylers: [{ color: "#7dcdcd" }],
-          },
-        ]
-      }
     };
   },
   mounted() {
-    this.initMap();
+
   },
   methods: {
-    initMap() {
-      var myLatlng = new window.google.maps.LatLng(
-        this.currentPosition.lat, 
-        this.currentPosition.lng
-      );
-      
-      var mapOptions = {
-        zoom: 13,
-        center: myLatlng,
-        scrollwheel: true,
-        zoomControl: false,
-        mapTypeControl: false,
-        styles: this.mapStyles[this.currentLayer],
-      };
-      
-      this.map = new window.google.maps.Map(
-        document.getElementById("map"),
-        mapOptions
-      );
-
-      this.marker = new window.google.maps.Marker({
-        position: myLatlng,
-        title: "当前位置",
-        animation: window.google.maps.Animation.DROP,
-        draggable: true
-      });
-
-      window.google.maps.event.addListener(this.marker, 'dragend', (event) => {
-        this.updatePosition(event.latLng.lat(), event.latLng.lng());
-      });
-
-      window.google.maps.event.addListener(this.map, 'click', (event) => {
-        this.moveMarker(event.latLng.lat(), event.latLng.lng());
-      });
-
-      this.marker.setMap(this.map);
+    // 处理子组件传递的经纬度
+    handlePositionUpdate(newPosition) {
+      this.currentPosition = newPosition;
     },
-    
-    zoomIn() {
-      if (this.map) {
-        this.map.setZoom(this.map.getZoom() + 1);
-      }
-    },
-    
-    zoomOut() {
-      if (this.map) {
-        this.map.setZoom(this.map.getZoom() - 1);
-      }
-    },
-    
-    resetView() {
-      if (this.map) {
-        this.map.setCenter(new window.google.maps.LatLng(
-          40.748817, -73.985428
-        ));
-        this.map.setZoom(13);
-        this.moveMarker(40.748817, -73.985428);
-      }
-    },
-    
-    changeMapStyle() {
-      if (this.map) {
-        this.map.setOptions({
-          styles: this.mapStyles[this.currentLayer]
-        });
-      }
-    },
-    
-    moveMarker(lat, lng) {
-      if (this.marker && this.map) {
-        const position = new window.google.maps.LatLng(lat, lng);
-        this.marker.setPosition(position);
-        this.updatePosition(lat, lng);
-      }
-    },
-    
-    updatePosition(lat, lng) {
-      this.currentPosition.lat = lat;
-      this.currentPosition.lng = lng;
-    }
   }
 };
 </script>
@@ -246,11 +63,6 @@ export default {
   position: relative;
   height: 100%;
   width: calc(100% - 200px);
-}
-
-#map {
-  height: 100%;
-  width: 100%;
 }
 
 .control-panel {
@@ -314,7 +126,7 @@ export default {
   position: absolute;
   bottom: 20px;
   right: 20px;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.6); /* 你可以调整这里的透明度，例如 0.8 */
   padding: 10px 15px;
   border-radius: 5px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -323,8 +135,9 @@ export default {
 
 .coordinates {
   display: flex;
-  flex-direction: column;
-  gap: 5px;
+  /* flex-direction: column; */ /* 移除或注释掉这一行 */
+  flex-direction: row; /* 或者明确设置为 row */
+  gap: 15px; /* 调整经纬度之间的间距 */
   font-size: 12px;
   color: #555;
 }
@@ -334,7 +147,7 @@ export default {
     flex-direction: column;
     height: calc(100vh - 80px);
   }
-  
+
   .map-controls {
     width: 100%;
     height: auto;
@@ -342,16 +155,16 @@ export default {
     border-right: none;
     border-bottom: 1px solid #e0e0e0;
   }
-  
+
   .map-container {
     width: 100%;
     height: calc(100% - 70px);
   }
-  
+
   .control-panel {
     flex-direction: row;
     align-items: center;
-    gap: 15px;
+    gap: 5px;
   }
 }
 </style>

@@ -1,6 +1,7 @@
 <template>
   <div
     class="sidebar"
+    :class="{ 'is-collapsed': collapsed }"
     :data-background-color="backgroundColor"
     :data-active-color="activeColor"
   >
@@ -13,9 +14,9 @@
       <div class="logo">
         <a href="#" class="simple-text">
           <div class="logo-img">
-            <img src="@/assets/img/vue-logo.png" alt="" />
+            <img src="@/assets/img/logo.png" alt="" />
           </div>
-          {{ title }}
+          <span v-if="!collapsed">{{ title }}</span>
         </a>
       </div>
       <slot> </slot>
@@ -26,13 +27,14 @@
             v-for="(link, index) in sidebarLinks"
             :key="index"
             :to="link.path"
-            :name="link.name"
+            :name="collapsed ? '' : link.name"
             :icon="link.icon"
+            :collapsed="collapsed" 
           >
           </sidebar-link>
         </slot>
       </ul>
-      <moving-arrow :move-y="arrowMovePx"> </moving-arrow>
+      <moving-arrow v-if="!collapsed" :move-y="arrowMovePx"> </moving-arrow>
     </div>
   </div>
 </template>
@@ -43,7 +45,7 @@ export default {
   props: {
     title: {
       type: String,
-      default: "用地管理系统",
+      default: "存量建设用地管理系统",
     },
     backgroundColor: {
       type: String,
@@ -74,6 +76,10 @@ export default {
     autoClose: {
       type: Boolean,
       default: true,
+    },
+    collapsed: { // 新增 prop
+      type: Boolean,
+      default: false,
     },
   },
   provide() {
@@ -115,8 +121,12 @@ export default {
       });
     },
     addLink(link) {
-      const index = this.$slots.links.indexOf(link.$vnode);
-      this.links.splice(index, 0, link);
+      const index = this.$slots.links && this.$slots.links.length > 0 ? this.$slots.links.indexOf(link.$vnode) : -1;
+      if (index !== -1) {
+         this.links.splice(index, 0, link);
+      } else {
+         this.links.push(link); // Fallback if slot is used differently or for programmatically added links
+      }
     },
     removeLink(link) {
       const index = this.links.indexOf(link);
@@ -132,4 +142,48 @@ export default {
   },
 };
 </script>
-<style></style>
+<style lang="scss" scoped> // 或者 <style scoped>
+/* 请根据 DashboardLayout.vue 中定义的 $sidebar-width 和 $sidebar-collapsed-width 进行调整 */
+.sidebar {
+  width: 260px; /* 默认宽度 */
+  transition: width 0.33s cubic-bezier(0.685, 0.0473, 0.346, 1);
+}
+
+.sidebar.is-collapsed {
+  width: 70px; /* 折叠后的宽度 */
+}
+
+.sidebar.is-collapsed .logo .simple-text span {
+  display: none;
+}
+
+.sidebar.is-collapsed .logo .simple-text {
+  padding-left: 0;
+  padding-right: 0;
+  justify-content: center;
+}
+.sidebar.is-collapsed .logo .logo-img {
+  margin-left: 0;
+}
+
+
+/* 假设 SidebarLink 内部的文字在 <p> 标签内 */
+.sidebar.is-collapsed .nav li > a p {
+  display: none;
+}
+
+/* 调整 SidebarLink 中图标的样式 (如果需要) */
+.sidebar.is-collapsed .nav li > a .sidebar-icon { /* 假设图标 class 为 sidebar-icon */
+  margin-right: 0;
+  font-size: 20px; /* 可选：调整图标大小 */
+}
+.sidebar.is-collapsed .nav li > a {
+  padding-left: 10px; /* 根据需要调整内边距 */
+  padding-right: 10px;
+  justify-content: center;
+}
+.sidebar-wrapper { // 或者其他侧边栏的主要容器选择器
+  background-color: #132a66 !important; // 添加这行来设置背景颜色
+}
+
+</style>
