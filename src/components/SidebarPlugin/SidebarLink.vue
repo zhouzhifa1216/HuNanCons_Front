@@ -6,14 +6,17 @@
     v-bind="$attrs"
     tag="li"
   >
-    <a class="nav-link">
-      <slot>
-        <i v-if="icon" :class="icon"></i>
-        <p>{{ name }}</p>
-      </slot>
+    <a
+      class="nav-link"
+      :class="{ 'is-collapsed': collapsed }"
+      v-bind="$attrs"
+    >
+      <i v-if="icon" :class="icon"></i>
+      <p v-if="name && name.length > 0">{{ name }}</p>
     </a>
   </component>
 </template>
+
 <script>
 export default {
   name: "sidebar-link",
@@ -35,6 +38,10 @@ export default {
     tag: {
       type: String,
       default: "router-link",
+    },
+    collapsed: {
+      type: Boolean,
+      default: false,
     },
   },
   methods: {
@@ -62,4 +69,11 @@ export default {
   },
 };
 </script>
-<style></style>
+
+<style>
+
+
+a.is-collapsed p {
+  display: none;
+}
+</style>

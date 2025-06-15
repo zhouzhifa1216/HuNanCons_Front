@@ -1,17 +1,8 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-light">
+  <nav class="navbar navbar-expand-lg ">
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">{{ routeName }}</a>
-      <button
-        class="navbar-toggler navbar-burger"
-        type="button"
-        @click="toggleSidebar"
-        :aria-expanded="$sidebar.showSidebar"
-        aria-label="Toggle navigation"
-      >
-        <span class="navbar-toggler-bar"></span>
-        <span class="navbar-toggler-bar"></span>
-        <span class="navbar-toggler-bar"></span>
+      <button @click="emitToggleCollapse" class="btn btn-sm">
+        <i class="ti-menu-alt"></i> <!-- 或者其他你喜欢的图标 -->
       </button>
       <div class="collapse navbar-collapse">
         <ul class="navbar-nav ml-auto">
@@ -21,12 +12,7 @@
               <p>统计</p>
             </a>
           </li>
-          <drop-down
-            class="nav-item"
-            title="5 条通知"
-            title-classes="nav-link"
-            icon="ti-bell"
-          >
+          <drop-down class="nav-item" title="5 条通知" title-classes="nav-link" icon="ti-bell">
             <a class="dropdown-item" href="#">通知 1</a>
             <a class="dropdown-item" href="#">通知 2</a>
             <a class="dropdown-item" href="#">通知 3</a>
@@ -84,8 +70,20 @@ export default {
     logout() {
       auth.logout();
       this.$router.push('/login');
+    },
+    emitToggleCollapse() {
+      this.$emit('toggle-sidebar-collapse');
     }
   },
 };
 </script>
-<style></style>
+<style>
+.navbar .btn.btn-sm {
+  background-color: transparent !important;
+  border-color: transparent !important;
+}
+
+.navbar .btn.btn-sm i.ti-menu-alt {
+  color: #333333 !important;
+}
+</style>

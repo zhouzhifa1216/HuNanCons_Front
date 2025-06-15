@@ -34,7 +34,7 @@ const routes = [
     redirect: "/dashboard",
     meta: { 
       requiresAuth: true,
-      title: "仪表板"
+      title: "网页标题"
     },
     children: [
       {
@@ -42,7 +42,7 @@ const routes = [
         name: "dashboard",
         component: Dashboard,
         meta: { 
-          title: "仪表板概览",
+          title: "存量建设用地管理系统",
           icon: "ti-panel"
         }
       },
