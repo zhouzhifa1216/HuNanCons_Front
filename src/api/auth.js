@@ -15,7 +15,7 @@ export async function login(email, password) {
   formData.append('username', email); // 注意：参数名是username，但需要传入邮箱
   formData.append('password', password);
   
-  const data = await request('/api/v1/auth/login', {
+  const data = await request('/api/v1/system/auth/login', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
