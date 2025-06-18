@@ -42,7 +42,7 @@ const routes = [
         name: "dashboard",
         component: Dashboard,
         meta: { 
-          title: "存量建设用地管理系统",
+          title: "数据监控 ",
           icon: "ti-panel"
         }
       },
